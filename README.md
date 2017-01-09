@@ -1,0 +1,2 @@
+# CoMiRe
+Convex Mixture Regression
