@@ -1,0 +1,8 @@
+import(stats)
+import(utils)
+importFrom("grDevices", "dev.off", "pdf")
+importFrom("graphics", "par", "plot", "points")
+import(truncnorm)
+import(gtools)
+export(comire.gibbs)
+export(mix.gibbs)
