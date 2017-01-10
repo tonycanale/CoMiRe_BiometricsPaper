@@ -7,9 +7,9 @@
 # [Canale, Durante, Dunson, 2017, "Convex Mixture Regression for Quantitative Risk Assessment"]
 # ---
 
-# load the comire set of functions of the 'comire' package
-# install the package with R CMD INSTALL comire_*.tar.gz before running this script
-require(comire)
+# load the CoMiRe set of functions of the 'CoMiRe' package
+# install the package with R CMD INSTALL CoMiRe_*.tar.gz before running this script
+require(CoMiRe)
 
 # load the CPP data
 load("cpp.rda")
