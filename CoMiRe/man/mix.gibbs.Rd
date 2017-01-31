@@ -17,7 +17,7 @@ a list giving the MCMC parameters. It must include the
           following integers: \code{nb} giving the number of burn-in iterations, \code{nrep} giving
           the total number of iterations, \code{thin} giving the thinning interval, \code{ndisplay} giving the multiple of iterations to be displayed on screen while the algorithm is running (a message will be printed every \code{ndisplay} iterations)}
   \item{prior}{
-a list containing the values of the hyperparameters. It must include the following values: \code{mu0}, the prior mean for each location paramter, \code{kappa} the prior precision for each location paramter, \code{a} and \code{b} prior scale and shape parameter for the gamma distribution of each precision parameter, \code{H} total number of components, and \code{alpha} prior for the mixture weights.}
+a list containing the values of the hyperparameters. It must include the following values: \code{mu0}, the prior mean for each location paramter, \code{kappa} the prior variance for each location paramter, \code{a} and \code{b} prior scale and shape parameter for the gamma distribution of each precision parameter, \code{H} total number of components, and \code{alpha} prior for the mixture weights.}
   \item{state}{
 a list giving the current value of the parameters. This list is used if the current analysis is the continuation of a
           previous analysis or if we want to start the MCMC algorithm from some particular value of the parameters.}
