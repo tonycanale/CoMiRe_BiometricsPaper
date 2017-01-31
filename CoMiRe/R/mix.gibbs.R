@@ -48,11 +48,11 @@ function(y, grid=NULL, mcmc, prior, state=NULL, seed)
     deviance_h = (n_h-1)*tapply(y, factor(c, levels=1:H), var)
     mean_h[n_h==0]  = 0
     deviance_h[n_h<=1] = 0
-    hat_b = prior$b + 0.5*(deviance_h + n_h/(1+prior$kappa*n_h)*(mean_h-prior$mu0)^2)
-    hat_kappa = 1/(1/prior$kappa + n_h)
-    hat_mu = hat_kappa*(1/prior$kappa*prior$mu0 + n_h*mean_h)
+    hat_b = prior$b + 0.5*(deviance_h)
     tau[ite, ] = rgamma(H, hat_a, hat_b)
-    mu[ite, ] = rnorm(H, hat_mu, sqrt(hat_kappa/tau[ite,]))
+    hat_kappa = 1/(1/prior$kappa + n_h*tau[ite, ])
+    hat_mu = hat_kappa*(1/prior$kappa*prior$mu0 + n_h*mean_h*tau[ite, ])
+    mu[ite, ] = rnorm(H, hat_mu, sqrt(hat_kappa))
   }
   
   post.mean.mu <- colMeans(mu[-c(1:mcmc$nb),][1:((mcmc$nrep)/mcmc$thin)*mcmc$thin,])

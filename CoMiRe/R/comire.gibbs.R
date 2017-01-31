@@ -123,11 +123,11 @@ function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, 
     deviance_h = (n_h-1)*tapply(y[ind0], factor(c0, levels=1:H), var)
     mean_h[n_h==0]  = 0
     deviance_h[n_h<=1] = 0
-    hat_b = prior$b + 0.5*(deviance_h + n_h/(1+prior$kappa*n_h)*(mean_h-prior$mu0)^2)
-    hat_kappa = 1/(1/prior$kappa + n_h)
-    hat_mu = hat_kappa*(1/prior$kappa*prior$mu0 + n_h*mean_h)
+    hat_b = prior$b + 0.5*(deviance_h)
     tau0[ite, ] = rgamma(H, hat_a, hat_b)
-    mu0[ite, ] = rtruncnorm(H, a=mu1[ite-1], b=Inf, hat_mu, sqrt(hat_kappa/tau0[ite,]))
+    hat_kappa = 1/(1/prior$kappa + n_h*tau0[ite,])
+    hat_mu = hat_kappa*(1/prior$kappa*prior$mu0 + n_h*mean_h*tau0[ite, ])
+    mu0[ite, ] = rtruncnorm(H, a=mu1[ite-1], b=Inf, hat_mu, sqrt(hat_kappa))
     
     # in cluster 1
     n_h = sum(d==1)
@@ -136,11 +136,11 @@ function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, 
     deviance_h = (n_h-1)*var(y[ind1])
     mean_h[n_h==0]  = 0
     deviance_h[n_h<=1] = 0
-    hat_b = prior$b + 0.5*(deviance_h + n_h/(1+prior$kappa*n_h)*(mean_h-prior$mu0)^2)
-    hat_kappa = 1/(1/prior$kappa + n_h)
-    hat_mu = hat_kappa*(1/prior$kappa*prior$mu0 + n_h*mean_h)
+    hat_b = prior$b + 0.5*(deviance_h)
     tau1[ite] = rgamma(1, hat_a, hat_b)
-    mu1[ite] = rtruncnorm(1, a=-Inf, b=min(mu0[ite, ]), hat_mu, sqrt(hat_kappa/tau1[ite]))# c(30, 35, 40)#
+    hat_kappa = 1/(1/prior$kappa + n_h*tau1[ite])
+    hat_mu = hat_kappa*(1/prior$kappa*prior$mu0 + n_h*mean_h*tau1[ite])
+    mu1[ite] = rtruncnorm(1, a=-Inf, b=min(mu0[ite, ]), hat_mu, sqrt(hat_kappa))# c(30, 35, 40)#
     
     # update the values of the densities in the observed points
     f0i = sapply(1:n, mixdensity, y=y, pi=pi0[ite,], mu=mu0[ite,], tau=tau0[ite,])
