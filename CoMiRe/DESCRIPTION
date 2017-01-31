@@ -1,8 +1,8 @@
 Package: CoMiRe
 Type: Package
 Title: Convex Mixture Regression
-Version: 0.1
-Date: 2017-01-08
+Version: 0.2
+Date: 2017-01-31
 Author: Antonio Canale
 Maintainer: Antonio Canale <canale.antonio@gmail.com>
 Depends: truncnorm, gtools
