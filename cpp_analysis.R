@@ -4,11 +4,11 @@
 # [Longnecker et al., 2001, "Association between maternal serum concentration of the DDT metabolite 
 #  DDE and preterm and small-for- gestational-age babies at birth.", The Lancet, 358]
 # as discussed in 
-# [Canale, Durante, Dunson, 2017, "Convex Mixture Regression for Quantitative Risk Assessment"]
+# ["Convex Mixture Regression for Quantitative Risk Assessment"]
 # ---
 
-# load the CoMiRe set of functions of the 'CoMiRe' package
-# install the package with R CMD INSTALL CoMiRe_*.tar.gz before running this script
+# load the comire set of functions of the 'comire' package
+# install the package with R CMD INSTALL comire_*.tar.gz before running this script
 require(CoMiRe)
 
 # load the CPP data
@@ -19,7 +19,7 @@ n <- NROW(cpp)
 
 # Bayesian preprocess
 H <-10
-prior <- list(mu0=mean(y), dirpar=rep(1, 6), kappa=1, a=2, b=2, H=10, J=6, alpha=1)
+prior <- list(mu0=mean(y), dirpar=rep(1, 6), kappa=10, a=2, b=2, H=10, J=6, alpha=1)
 mcmc <- list(nrep=5000, nb=4000, thin=5, ndisplay=8)
 fit.bayes.start <- mix.gibbs(y, mcmc=mcmc, prior=prior, seed=1)
   
@@ -34,7 +34,7 @@ source("cpp_basis.R")
 
 # Bayesian estimation 
 mcmc <- list(nrep=50000, nb=4000, thin=5, ndisplay=4)
-prior <- list(mu0=mean(y), dirpar=rep(1, 6), kappa=1, a=2, b=2, H=10, J=6, alpha=1)
+prior <- list(mu0=mean(y), dirpar=rep(1, 6), kappa=10, a=2, b=2, H=10, J=6, alpha=1)
 fit.bayes <- comire.gibbs(y, x, basistype="empirical", basisX=basisX, 
                           mcmc=mcmc, prior=prior, state=start.state, seed=1)
 
