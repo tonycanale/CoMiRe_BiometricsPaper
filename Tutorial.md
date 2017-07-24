@@ -105,7 +105,7 @@ xlab <- c("Gestational age at delivery (DDE<15)",
           )
 ```
 
-Then using the R function ´post.pred.check()´ we simulate one observation from the posterior predictive distribution (fitted in ´fit.comire´) of *y* ∣ *x* with *x* being the median of the covariates in each bin.
+Then using the R function `post.pred.check()` we simulate one observation from the posterior predictive distribution (fitted in `fit.comire`) of *y* ∣ *x* with *x* being the median of the covariates in each bin.
 
 ``` r
 y.pred <- post.pred.check(x.cpoints, fit=fit.comire, mcmc=mcmc, J=prior$J)
