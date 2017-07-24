@@ -1,5 +1,5 @@
 comire.gibbs <-
-function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, seed, max.x=1)
+function(y, x, grid=NULL, mcmc, prior, state=NULL, seed, max.x=max(x))
 {
   #internal working variables
   n <- length(y)
@@ -37,7 +37,7 @@ function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, 
   }
   if(is.null(grid$grids))
   {
-    x.grid <- seq(0,250, length=250)
+    x.grid <- seq(0, max.x, length=100)
     y.grid <- seq(min(y)-sqrt(var(y)), max(y) + sqrt(var(y)), length = 100)	
     beta_x = matrix(NA, mcmc$nrep+mcmc$nb, length(x.grid))	
     f0 = matrix(NA, mcmc$nrep+mcmc$nb, length(y.grid))
@@ -52,33 +52,14 @@ function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, 
     f1 = matrix(NA, mcmc$nrep+mcmc$nb, length(y.grid))
   }
   
-  # basis of X
-  if(basistype=="BetaCDF")
-  {
-    J <- prior$J
-    x.std <- x/max.x
-    Fl <- matrix(NA,length(x), 2^J)
-    for(l in 1:(2^J))
-    {
-      Fl[,l] <- pbeta(x.std, l, 2^J-l+1)
-    }
-    Fl.grid <- matrix(NA,length(x.grid), 2^J)
-    for(l in 1:(2^J))
-    {
-      Fl.grid[,l] <- pbeta(x.grid, l, 2^J-l+1)
-    }
-  }
-  if(basistype=="empirical")
-  {
-    Fl <- basisX(x)
-    J <- NCOL(Fl)
-    Fl.grid <- basisX(x.grid)
-  }
-  if((basistype!="BetaCDF") & (basistype!="empirical")) 
-    stop("basistype need to be 'empirical' or 'BetaCDF'\n")
-    
+  # basis expansion
+  knots <- seq(0, max.x, length=prior$J-3)
+  basisX <- function(x) iSpline(x, df=3, knots = knots, Boundary.knots=c(0,max.x))
+  phiX <- basisX(x)
+  phi.grid <- basisX(x.grid)
+
   #beta_i is the interpolating function evaluated at x_i
-  beta_i =  as.double(Fl %*% w[1, ])
+  beta_i =  as.double(phiX %*% w[1, ])
   
   # f0i and f1i
   f0i = sapply(1:n, mixdensity, y=y, pi=pi0[1,], mu=mu0[1,], tau=tau0[1,])
@@ -96,7 +77,7 @@ function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, 
     d = rbinom(n, 1, prob=(beta_i*f1i)/((1-beta_i)*f0i + beta_i*f1i))
     
     #2. Update b_i from the multinomial 
-    b = sapply(1:n, labelling_b, w[ite-1,], Fl=Fl, f0i=f0i, f1i=f1i)
+    b = sapply(1:n, labelling_b, w[ite-1,], phi=phiX, f0i=f0i, f1i=f1i)
     
     #3. Update c_i, marginalizing over b_i and d_i, from the multinomial 
     ind0 <- c(1:n)[d==0]
@@ -111,7 +92,7 @@ function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, 
     #5. Update w from the Dirichlet and obtain an updated function beta_i
     dirpar.post = as.double(prior$dirpar + table(factor(b, levels=1:length(w[ite-1,]))))
     w[ite, ] = as.double(rdirichlet(1, dirpar.post))
-    beta_i = as.numeric(Fl %*% w[ite, ])
+    beta_i = as.numeric(phiX %*% w[ite, ])
     beta_i[beta_i>1] <- 1
     beta_i[beta_i<0] <- 0
     
@@ -147,7 +128,7 @@ function(y, x, basistype="BetaCDF", basisX, grid=NULL, mcmc, prior, state=NULL, 
     f1i = dnorm(y, mu1[ite], sqrt(1/tau1[ite]))
     
     #7. compute some posterior quanities of interest
-    beta_x[ite, ] = Fl.grid %*% w[ite, ]
+    beta_x[ite, ] = phi.grid %*% w[ite, ]
     f0[ite, ] = sapply(1:length(y.grid), mixdensity, y=y.grid, pi=pi0[ite,], mu=mu0[ite,], tau=tau0[ite,])
     f1[ite, ] = dnorm(y.grid, mu1[ite], sqrt(1/tau1[ite]))
     
