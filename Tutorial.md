@@ -13,7 +13,6 @@ library(CoMiRe)
 library(splines2)
 library(ggplot2)
 library(gridExtra)
-load("~/Documents/1_Research/CoMiRe/3_R/CPP/fitcomire.RData")
 ```
 
 Load the CPP data
@@ -85,7 +84,7 @@ mcmc <- list(nrep=50000, nb=4000, thin=5, ndisplay=4)
 Now we are ready to run the MCMC
 
 ``` r
-#fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
+fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
 ```
 
 Posterior predictive check
@@ -172,16 +171,16 @@ The function `BMD()` extract estimates for the benchmark dose related to a given
 bmd.data <- BMD(seq(0,.20, length=50), risk.data$mcmc.risk, x=seq(0,max(x), length=100))
 ```
 
-A graphical representation of the BMD**<sub>*q*</sub> for the different values of *q* can be obtained with
+A graphical representation of the BMD<sub>*q*</sub> for the different values of *q* can be obtained with
 
 ``` r
 bmd.data <- BMD(seq(0,.20, length=50), risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=0.05)
 bmd.plot(bmd.data)
 ```
 
-![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-15-1.png)
+![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-14-1.png)
 
-where the solid line represent the posterior mean BMD\_q and the shaded areas the related 95% credible bands. Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_q, estimated via posterior mean, and the benchmark dose limit (BMDL\_q), estimateted with 5% quantile of the posterior distribution of the benchmark dose.
+where the solid line represent the posterior mean BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands. Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimateted with 5% quantile of the posterior distribution of the benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
