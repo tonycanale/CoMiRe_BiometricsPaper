@@ -180,16 +180,16 @@ bmd.plot(bmd.data)
 
 ![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-14-1.png)
 
-where the solid line represent the posterior mean BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands. Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimateted with 5% quantile of the posterior distribution of the benchmark dose.
+where the solid line represent the posterior mean BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands. Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimated with 5% quantile of the posterior distribution of the benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
-BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,max(x), length=100))
+BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=.1)
 knitr::kable(BMDq[c(1,2,5)], digits = 2)
 ```
 
 |     q|    BMD|  BMDL|
 |-----:|------:|-----:|
-|  0.01|   1.02|  0.58|
-|  0.05|   5.25|  3.32|
-|  0.10|  13.91|  8.68|
+|  0.01|   1.02|  0.62|
+|  0.05|   5.25|  3.58|
+|  0.10|  13.91|  9.52|
