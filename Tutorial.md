@@ -184,12 +184,12 @@ where the solid line represent the posterior mean BMD<sub>*q*</sub> and the shad
 
 ``` r
 q.values <- c(1,5,10)/100
-BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=.1)
+BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=.05)
 knitr::kable(BMDq[c(1,2,5)], digits = 2)
 ```
 
 |     q|    BMD|  BMDL|
 |-----:|------:|-----:|
-|  0.01|   1.02|  0.62|
-|  0.05|   5.25|  3.58|
-|  0.10|  13.91|  9.52|
+|  0.01|   1.02|  0.58|
+|  0.05|   5.25|  3.32|
+|  0.10|  13.91|  8.68|
