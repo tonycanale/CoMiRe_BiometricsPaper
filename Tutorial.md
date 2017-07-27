@@ -124,7 +124,7 @@ and it is plotted along with the histogram of the raw data.
 
 ![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-11-1.png)
 
-Marginal densities estimation
+Conditional densities for the response at selected dose values
 =============================
 
 We now compute pointwise posterior mean densities for *x* in being the central value of each bin introduced before.
