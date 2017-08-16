@@ -1,7 +1,7 @@
 Analysis of the CPP data
 ================
 
-Analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery [Longnecker et al., (2001)](http://www.thelancet.com/journals/lancet/article/PIIS0140673601053296/abstract) as discussed in [Canale, Durante and Dunson, (2017)](https://arxiv.org/abs/1701.02950)
+Analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery [Longnecker et al., (2001)](http://www.thelancet.com/journals/lancet/article/PIIS0140673601053296/abstract) as discussed in the submitted paper.
 
 Load data and packages
 ======================
@@ -32,7 +32,7 @@ ggplot(data=cpp) + geom_point(aes(x=dde, y=gest), alpha=.5, cex=.5) +
   xlab("Dichlorodiphenyldichloroethylene (DDE)") + ylab("Gestational age at delivery") + theme_bw()
 ```
 
-![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-3-1.png)
+![](Analysis_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-3-1.png)
 
 To have a first quantification we fit a simple logistic model to the dichotimized outcome, i.e. we classify a birth as premature if it occurs before 37 weeks.
 
@@ -84,8 +84,14 @@ mcmc <- list(nrep=50000, nb=4000, thin=5, ndisplay=4)
 Now we are ready to run the MCMC
 
 ``` r
-fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
+fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1)
 ```
+
+    ## Burn in done
+    ## 16500 iterations over 54000 
+    ## 29000 iterations over 54000 
+    ## 41500 iterations over 54000 
+    ## 54000 iterations over 54000
 
 Posterior predictive check
 ==========================
@@ -122,36 +128,8 @@ bw <- mean(bandwidths)
 
 and it is plotted along with the histogram of the raw data.
 
-![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-11-1.png)
+![](Analysis_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-11-1.png)
 
-Conditional densities of the response at selected exposures
-=============================
-
-We now compute pointwise posterior mean densities for *x* in being the central value of each bin introduced before.
-
-``` r
-y.grid <- seq(min(y)-sqrt(var(y)), max(y) + sqrt(var(y)), length = 100) 
-all.pdf <- list()
-for(j in 1:6)
-  {
-  pdf_fit <- fit.cdf.mcmc(x.cpoints[j], y.grid=y.grid, fit.comire, mcmc=mcmc, H=10, max.x=180)
-  data <- data.frame(pdf_fit, y.grid)
-  names(data)[1:3] <- c("mean","low","upp")
- 
-   pdf.j <- ggplot(data) +  
-    geom_line(aes(x=y.grid, y=mean), col="blue") +
-    geom_ribbon(aes(ymax=upp, ymin=low, x=y.grid), fill=4,alpha=.1) + 
-    coord_cartesian(xlim=c(25,48)) +  labs(x=xlab[j], y="") + 
-    theme_bw() + coord_cartesian(ylim=c(0, 0.25)) +
-    theme(plot.margin=unit(c(1,0,0,0),"lines"), axis.title=element_text(size=10))
-  
-  all.pdf[[j]] <- pdf.j
-}
-
-grid.arrange(all.pdf[[1]],all.pdf[[2]],all.pdf[[3]],all.pdf[[4]],all.pdf[[5]],all.pdf[[6]], ncol=3, nrow=2)
-```
-
-![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-12-1.png)
 
 Additional risk and BMD
 =======================
@@ -163,7 +141,7 @@ risk.data <- add.risk(a=37, fit=fit.comire, mcmc=mcmc, xgrid=seq(0,max(x), lengt
 riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)", x=x)
 ```
 
-![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-13-1.png)
+![](Analysis_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-13-1.png)
 
 The function `BMD()` extract estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
 
@@ -171,25 +149,25 @@ The function `BMD()` extract estimates for the benchmark dose related to a given
 bmd.data <- BMD(seq(0,.20, length=50), risk.data$mcmc.risk, x=seq(0,max(x), length=100))
 ```
 
-A graphical representation of the BMD<sub>*q*</sub> for the different values of *q* can be obtained with
+A graphical representation of the BMD**<sub>*q*</sub> for the different values of *q* can be obtained with
 
 ``` r
 bmd.data <- BMD(seq(0,.20, length=50), risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=0.05)
 bmd.plot(bmd.data)
 ```
 
-![](tutorial_img/figure-markdown_github-ascii_identifiers/unnamed-chunk-14-1.png)
+![](Analysis_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-15-1.png)
 
-where the solid line represent the posterior mean BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands. Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimated with 5% quantile of the posterior distribution of the benchmark dose.
+where the solid line represent the posterior mean BMD\_q and the shaded areas the related 95% credible bands. Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_q, estimated via posterior mean, and the benchmark dose limit (BMDL\_q), estimateted with 5% quantile of the posterior distribution of the benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
-BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=.05)
+BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=.1)
 knitr::kable(BMDq[c(1,2,5)], digits = 2)
 ```
 
 |     q|    BMD|  BMDL|
 |-----:|------:|-----:|
-|  0.01|   1.02|  0.58|
-|  0.05|   5.25|  3.32|
-|  0.10|  13.91|  8.68|
+|  0.01|   1.02|  0.62|
+|  0.05|   5.25|  3.57|
+|  0.10|  13.91|  9.52|
