@@ -22,7 +22,6 @@ load("cpp.rda")
 x = cpp$dde    # DDE 
 y = cpp$gest   # gestational week at delivery
 n <- NROW(cpp)
-load("finalresAgo.RData")
 ```
 
 The DDE has a clear effect in determining premature births as can be seen from
@@ -86,7 +85,7 @@ mcmc <- list(nrep=50000, nb=4000, thin=5, ndisplay=4)
 The Gibbs sampling algorithm is executed via
 
 ``` r
-#fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
+fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
 ```
 
 Posterior predictive check
