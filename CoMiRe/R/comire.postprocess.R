@@ -83,15 +83,16 @@ BMD <- function(level, risk, x, alpha=0.05)
   bmd.apply <- function(q) apply(risk, 1, bmd, q=q, range=c(0,180))
   if(length(level)==1){
     bmd.data <- bmd.apply(level)
-    return(c(mean(bmd.data), quantile(bmd.data, probs=c(alpha/2,1-alpha/2))))
+    return(c(mean(bmd.data), quantile(bmd.data, probs=c(alpha/2,1-alpha/2,alpha))))
   }
   else
   {
   bmd.mcmc.comire <-  sapply(level, bmd.apply)
   bmd.data <- data.frame(level,
                          colMeans(bmd.mcmc.comire, na.rm=TRUE), 
-                         t(apply(bmd.mcmc.comire,2,quantile, prob=c(alpha/2,1-alpha/2), na.rm=TRUE)))
-  colnames(bmd.data) <- c("q", "mean","low","upp")
+                         t(apply(bmd.mcmc.comire,2,quantile, prob=c(alpha/2,1-alpha/2), na.rm=TRUE)),
+                         apply(bmd.mcmc.comire,2,quantile, prob=alpha, na.rm=TRUE))
+  colnames(bmd.data) <- c("q", "BMD","low","upp", "BMDL")
   return(bmd.data)
   }
 }
@@ -113,8 +114,8 @@ riskplot <- function(risk.data, xlabel="x", x=NULL)
 # bmd plot
 bmd.plot <- function(bmd.data)
 {
-  ggplot(bmd.data, aes(q,mean)) + 
-  geom_line(aes(q, mean), lty=1, col=4) + geom_ribbon(aes(ymax=upp, ymin=low), fill=4,alpha=.1) +
+  ggplot(bmd.data, aes(q,BMD)) + 
+  geom_line(aes(q, BMD), lty=1, col=4) + geom_ribbon(aes(ymax=upp, ymin=low), fill=4,alpha=.1) +
   labs(y=expression(BMD[q]), x="q")+ theme_bw() + 
   theme(plot.margin=unit(c(1,0,0,0),"lines"))  
 }

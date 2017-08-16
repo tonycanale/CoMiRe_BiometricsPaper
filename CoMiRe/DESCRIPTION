@@ -1,10 +1,10 @@
 Package: CoMiRe
 Type: Package
 Title: Convex Mixture Regression
-Version: 0.2
-Date: 2017-01-31
+Version: 0.3
+Date: 2017-08-15
 Author: Antonio Canale
-Maintainer: Antonio Canale <canale.antonio@gmail.com>
-Depends: truncnorm, gtools
+Maintainer: Antonio Canale <canale@stat.unipd.it>
+Depends: truncnorm, gtools, ggplot2, splines2
 Description: Posterior inference under the convex mixture regression (CoMiRe) model of Canale, A., Durante, D., and Dunson, D. (2017), Convex Mixture Regression for Quantitative Risk Assessment.
 License: GPL-2
