@@ -207,7 +207,7 @@ riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)"
 
 The notable increment of the risk function at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
 
-A graphical representation of the BMD\_q for the different values of *q* can be obtained with
+A graphical representation of the BMD<sub>*q*</sub> for the different values of *q* can be obtained with
 
 ``` r
 bmd.data <- BMD(seq(0,.20, length=50), risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=0.05)
@@ -216,9 +216,9 @@ bmd.plot(bmd.data)
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/bmd-1.png)
 
-where the solid line represent the pointwise posterior mean BMD\_q and the shaded areas the related 95% credible bands.
+where the solid line represent the pointwise posterior mean BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands.
 
-Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_q, estimated via the posterior mean, and the benchmark dose limit (BMDL\_q), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
+Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via the posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
