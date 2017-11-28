@@ -1,6 +1,6 @@
 # CoMiRe: Convex Mixture Regression for Quantitative Risk Assessment 
 
-R functions and scripts to implement the convex mixture regression model of
+This repository contains the R functions and scripts to implement the **Convex Mixture Regression model** of
 
 - Canale, A., Durante, D., and Dunson, D. B., (2017), [Convex Mixture Regression for Quantitative Risk Assessment](http://arxiv.org/abs/1701.02950), __ArXiv__, 1701.02950
 
