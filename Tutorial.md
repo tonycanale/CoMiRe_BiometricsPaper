@@ -189,7 +189,7 @@ betaplot + geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, 
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/beta-1.png)
 
-The plot highlights a notable increment in the probability of the most adverse health profile at low--dose exposures.
+The plot highlights a notable increment in the probability of the most adverse health profile at low-dose exposures.
 
 Additional risk and BMD
 =======================
@@ -205,7 +205,7 @@ riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)"
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/risk-1.png)
 
-The notable increment of the risk function at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
+The notable increment of the risk function at low-dose exposures suggests conservative benchmark doses. This is confirmed by looking at the BMD<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
 
 A graphical representation of the BMD<sub>*q*</sub> for the different values of *q* can be obtained with
 
@@ -216,9 +216,9 @@ bmd.plot(bmd.data)
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/bmd-1.png)
 
-where the solid line represent the pointwise posterior mean BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands.
+where the solid line represent the pointwise posterior mean of the BMD<sub>*q*</sub> and the shaded areas are the related 95% credible bands.
 
-Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via the posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
+Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via the posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimateted with the lower 5% quantile of the posterior distribution of the corresponding benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
