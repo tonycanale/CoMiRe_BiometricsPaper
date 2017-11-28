@@ -69,7 +69,7 @@ summary(glmfit)
 CoMiRe estimation
 =================
 
-To fit the comire model it is first necessary to fix the following prior paramters:
+To fit the **CoMiRe** model it is first necessary to fix the following prior paramters:
 
 ``` r
 J <- 10 
@@ -98,15 +98,15 @@ fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
 Posterior predictive check
 ==========================
 
-Before assessing the performance in estimating the additional risks and benchmark doses, we check the model adequacy in terms of goodness of fit by means of posterior predictive checks.
+Before assessing the performance of CoMiRe in inference on the additional risk functions and benchmark doses, we first check the model adequacy in terms of goodness of fit. This is done via posterior predictive checks as discussed in Section 3.1 of the paper. 
 
-Specifically, we use the R function `post.pred.check()` which draws from the posterior predictive the smoothed empirical estimates of *F*<sub>*x*</sub>(37).
+Specifically, we use the R function `post.pred.check()` to draw samples from the posterior predictive distribution of a smoothed empirical estimate of *F*<sub>*x*</sub>(37).
 
 ``` r
 below37.comire <- post.pred.check(x, fit.comire, mcmc, H=10, a=37, max.x=180)
 ```
 
-Then we select 50 samples from this posterior predictive smoothed estimates of *F*<sub>*x*</sub>(37) and plot them along with the related quantity obtained calculated on the original observed sample.
+We draw 50 of these samples and plot them along with the smoothed empirical estimate of *F*<sub>*x*</sub>(37) calculated from the observed sample data in the CPP application.
 
 ``` r
 below37.true <- locpoly(x=x, y=y<37, degree=0, bandwidth = 20, 
@@ -124,10 +124,10 @@ ppc
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/pp_cfr-1.png)
 
-Marginal densities estimation
+Inference on the conditional density
 =============================
 
-We now compute the pointwise posterior mean densities for different *x* value. Specifically, we first subdivide the observed data in bins with
+We now study the posterior distribution of the conditional density of the response computed for different values *x* of the dose. Specifically, we first subdivide the observed dose exposures in bins with
 
 ``` r
 break.points <- c(0, 15,30,45,60, 75, 180)
@@ -142,7 +142,7 @@ xlab <- c("Gestational age at delivery (DDE<15)",
           )
 ```
 
-Then the pointwise posterior mean densities for *x* in `x.cpoints` can be obtained with
+Then the pointwise mean and credible bands for the conditional density of the response can be obtained for every *x* in `x.cpoints` as follows
 
 ``` r
 y.grid <- seq(min(y)-sqrt(var(y)), max(y) + sqrt(var(y)), length = 100) 
@@ -171,9 +171,9 @@ grid.arrange(all.pdf[[1]],all.pdf[[2]],all.pdf[[3]],all.pdf[[4]],all.pdf[[5]],al
 Inference on the interpolating function
 =======================================
 
-Both adverse and non-adverse profiles are found across all the predictor space. What crucially changes with DDE is the degree *β*(*x*) of susceptibility of the women to the adverse effects of this chemical.
+Base on the above Figure, both adverse and non-adverse profiles are found across all the predictor space. What crucially changes with DDE is the degree *β*(*x*) of susceptibility of the women to the adverse effects of this chemical.
 
-The posterior mean and the 95% credible bands of the *β*(*x*) can be obtained with
+The pointwise posterior mean and the 95% credible bands of the *β*(*x*) can be obtained with
 
 ``` r
 beta.data <- data.frame(beta=fit.comire$post.means$beta,
@@ -194,9 +194,9 @@ The plot highlights a notable increment in the probability of the most adverse h
 Additional risk and BMD
 =======================
 
-To perform a benchmark dose analyses by means of the additional risk function, we consider the standard preterm threshold *a* = 37.
+To perform benchmark dose analysis by means of the additional risk function, we consider the standard preterm threshold *a* = 37.
 
-To obtain the additional risk function for a given threshold use the `add.risk()` function and plot it in function of `x` with `riskplot()`.
+To obtain the additional risk function for a given threshold use the `add.risk()` function and plot it as a function of `x` with `riskplot()`.
 
 ``` r
 risk.data <- add.risk(a=37, fit=fit.comire, mcmc=mcmc, xgrid=seq(0,max(x), length=100), y=y)
@@ -216,9 +216,9 @@ bmd.plot(bmd.data)
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/bmd-1.png)
 
-where the solid line represent the posterior mean BMD\_q and the shaded areas the related 95% credible bands.
+where the solid line represent the pointwise posterior mean BMD\_q and the shaded areas the related 95% credible bands.
 
-Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_q, estimated via posterior mean, and the benchmark dose limit (BMDL\_q), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
+Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_q, estimated via the posterior mean, and the benchmark dose limit (BMDL\_q), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
