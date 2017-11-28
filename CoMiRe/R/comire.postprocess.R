@@ -1,29 +1,25 @@
 # postetrior predictive check
-post.pred.check <- function(x.cpoints, fit, mcmc, max.x=max(x), J)
+post.pred.check <- function(x, fit, mcmc, H=10, a=37, max.x, bandwidth=20)
 {
   index <- c((mcmc$nb+1):(mcmc$nrep+mcmc$nb))[1:((mcmc$nrep)/mcmc$thin)*mcmc$thin]
-  x.grid <- seq(0, max.x, length=100)
-  y.grid <- seq(min(y)-sqrt(var(y)), max(y) + sqrt(var(y)), length = 100)	
-  y.pred <- matrix(NA, length(index), length(x.cpoints))
   knots <- seq(0, max.x, length=J-3)
   phi <- function(x) iSpline(x, df=3, knots = knots, Boundary.knots=c(0,max.x))
-  ite <- 1
-  for(i in index)
+  res <- rep(NA, length(index))
+  tailp.mcmc <- function(i, pi0, mu0, tau0, mu1, tau1, theta, phi_x)
   {
-    for(j in 1:length(x.cpoints))
+    beta_x <-  as.double(phi_x %*% theta[i,])
+    res <-  beta_x * pnorm(a, mu1[i], 1/sqrt(tau1[i]))
+    for(h in 1:ncol(pi0))
     {
-      beta <-  as.double(phi(x.cpoints[j]) %*% fit$mcmc$theta[i,])
-      pii <- round(c(beta * fit$mcmc$pi1[i], (1-beta)*fit$mcmc$pi0[i,]),8)
-      if(pii[1]==1) ind <- 1
-      else {
-        ind <- sample(1:length(pii), 1, prob=pii)
-      }
-      y.pred[ite,j] <- rnorm(1, c(fit$mcmc$mu1[i], fit$mcmc$mu0[i,])[ind], 
-                             1/sqrt(c(fit$mcmc$tau1[i], fit$mcmc$tau0[i,])[ind]))
+      res <- res + (1-beta_x)*pi0[i,h] * pnorm(a, mu0[i,h], 1/sqrt(tau0[i,h]))     
     }
-    ite <- ite + 1
+    below <- rbinom(length(res), 1, res)
+    smoothed <- locpoly(x=x, y=below, degree=0, bandwidth = bandwidth, 
+                        gridsize = 100, range.x = c(0, max.x))$y
   }
-  return(y.pred)
+  res <- sapply(index, tailp.mcmc, fit$mcmc$pi0, fit$mcmc$mu0, fit$mcmc$tau0,
+                fit$mcmc$mu1, fit$mcmc$tau1, fit$mcmc$theta, phi(x))
+  res
 }
 # posterior mean density
 fit.cdf.mcmc <- function(x, y.grid, fit, mcmc, H=10, max.x)
@@ -118,4 +114,28 @@ bmd.plot <- function(bmd.data)
   geom_line(aes(q, BMD), lty=1, col=4) + geom_ribbon(aes(ymax=upp, ymin=low), fill=4,alpha=.1) +
   labs(y=expression(BMD[q]), x="q")+ theme_bw() + 
   theme(plot.margin=unit(c(1,0,0,0),"lines"))  
+}
+#
+# posterior predictive risk
+posterior.predictive.risk <- function(x, fit, mcmc, H=10, a=37, max.x)
+{
+  index <- c((mcmc$nb+1):(mcmc$nrep+mcmc$nb))[1:((mcmc$nrep)/mcmc$thin)*mcmc$thin]
+  knots <- seq(0, max.x, length=J-3)
+  phi <- function(x) iSpline(x, df=3, knots = knots, Boundary.knots=c(0,max.x))
+  res <- rep(NA, length(index))
+  tailp.mcmc <- function(i, pi0, mu0, tau0, mu1, tau1, theta, phi_x)
+  {
+    beta_x <-  as.double(phi_x %*% theta[i,])
+    res <-  beta_x * pnorm(a, mu1[i], 1/sqrt(tau1[i]))
+    for(h in 1:ncol(pi0))
+    {
+      res <- res + (1-beta_x)*pi0[i,h] * pnorm(a, mu0[i,h], 1/sqrt(tau0[i,h]))     
+    }
+    below <- rbinom(length(res), 1, res)
+    smoothed <- locpoly(x=x, y=below, degree=0, bandwidth = 10, 
+                        gridsize = 100, range.x = c(0, max.x))$y
+  }
+  res <- sapply(index, tailp.mcmc, fit$mcmc$pi0, fit$mcmc$mu0, fit$mcmc$tau0,
+                fit$mcmc$mu1, fit$mcmc$tau1, fit$mcmc$theta, phi(x))
+  cbind( rowMeans(res), t(apply(res,1,quantile, probs=c(0.025, 0.975))))
 }
