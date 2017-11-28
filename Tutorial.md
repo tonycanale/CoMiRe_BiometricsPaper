@@ -13,6 +13,7 @@ library(CoMiRe)
 library(splines2)
 library(ggplot2)
 library(gridExtra)
+library(KernSmooth)
 ```
 
 Load the CPP data
@@ -79,7 +80,7 @@ prior <- list(mu0=mean(y), dirpar=rep(1, J)/J, kappa=1, a=2, b=2, H=H, J=J, alph
 and the following MCMC settings
 
 ``` r
-mcmc <- list(nrep=50000, nb=4000, thin=5, ndisplay=4)
+mcmc <- list(nrep=5000, nb=2000, thin=5, ndisplay=4)
 ```
 
 The Gibbs sampling algorithm is executed via
@@ -88,10 +89,45 @@ The Gibbs sampling algorithm is executed via
 fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
 ```
 
+    ## Burn in done
+    ## 3250 iterations over 7000 
+    ## 4500 iterations over 7000 
+    ## 5750 iterations over 7000 
+    ## 7000 iterations over 7000
+
 Posterior predictive check
 ==========================
 
-Before assessing the performance in estimating the additional risks and benchmark doses, we check the model adequacy in terms of goodness of fit by means of posterior predictive checks. Specifically, we subdivide the observed data in bins with
+Before assessing the performance in estimating the additional risks and benchmark doses, we check the model adequacy in terms of goodness of fit by means of posterior predictive checks.
+
+Specifically, we use the R function `post.pred.check()` which draws from the posterior predictive the smoothed empirical estimates of *F*<sub>*x*</sub>(37).
+
+``` r
+below37.comire <- post.pred.check(x, fit.comire, mcmc, H=10, a=37, max.x=180)
+```
+
+Then we select 50 samples from this posterior predictive smoothed estimates of *F*<sub>*x*</sub>(37) and plot them along with the related quantity obtained calculated on the original observed sample.
+
+``` r
+below37.true <- locpoly(x=x, y=y<37, degree=0, bandwidth = 20, 
+                        gridsize = 100, range.x = c(0, 180))$y
+ppc.data <- data.frame(cbind(x=seq(0,180, length=100), 
+                            Fx=c(c(below37.comire[,1:50*20])),
+                            repl=c(rep(1:50,each=100))))
+ppc <-    ggplot(ppc.data, aes(x=x, y=Fx)) + 
+  geom_line(alpha=0.25, aes(group=factor(repl)), col="grey") +
+  geom_line(data=data.frame(x=seq(0,180, length=100), y=below37.true), aes(x=x, y=y), col=1)+
+  ylab(expression(F[x](37)*" | data")) + theme_bw() + 
+  geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, cex=.5, pch="|") 
+ppc
+```
+
+![](Analysis_files/figure-markdown_github-ascii_identifiers/pp_cfr-1.png)
+
+Marginal densities estimation
+=============================
+
+We now compute the pointwise posterior mean densities for different *x* value. Specifically, we first subdivide the observed data in bins with
 
 ``` r
 break.points <- c(0, 15,30,45,60, 75, 180)
@@ -106,25 +142,31 @@ xlab <- c("Gestational age at delivery (DDE<15)",
           )
 ```
 
-Then using the R function `post.pred.check()` we simulate one observation from the posterior predictive distribution (fitted in `fit.comire`) of *y* ∣ *x* with *x* being the median of the covariates in each bin.
+Then the pointwise posterior mean densities for *x* in `x.cpoints` can be obtained with
 
 ``` r
-y.pred <- post.pred.check(x.cpoints, fit=fit.comire, mcmc=mcmc, J=prior$J)
-y.pred <- data.frame(y.pred)
+y.grid <- seq(min(y)-sqrt(var(y)), max(y) + sqrt(var(y)), length = 100) 
+all.pdf <- list()
+for(j in 1:6)
+  {
+  pdf_fit <- fit.cdf.mcmc(x.cpoints[j], y.grid=y.grid, fit.comire, mcmc=mcmc, H=10, max.x=180)
+  data <- data.frame(pdf_fit, y.grid)
+  names(data)[1:3] <- c("mean","low","upp")
+ 
+   pdf.j <- ggplot(data) +  
+    geom_line(aes(x=y.grid, y=mean), col="blue") +
+    geom_ribbon(aes(ymax=upp, ymin=low, x=y.grid), fill=4,alpha=.1) + 
+    coord_cartesian(xlim=c(25,48)) +  labs(x=xlab[j], y="") + 
+    theme_bw() + coord_cartesian(ylim=c(0, 0.25)) +
+    theme(plot.margin=unit(c(1,0,0,0),"lines"), axis.title=element_text(size=10))
+  
+  all.pdf[[j]] <- pdf.j
+}
+
+grid.arrange(all.pdf[[1]],all.pdf[[2]],all.pdf[[3]],all.pdf[[4]],all.pdf[[5]],all.pdf[[6]], ncol=3, nrow=2)
 ```
 
-The posterior predictive densities are then obtained via kernel smoothing using as bandwidth parameter the mean bandwith in each bin, i.e.
-
-``` r
-bandwidths <- c(density(y.pred$X1)$bw,density(y.pred$X2)$bw,density(y.pred$X3)$bw,
-                density(y.pred$X4)$bw,density(y.pred$X5)$bw,density(y.pred$X6)$bw)
-bw <- mean(bandwidths)
-```
-
-and it is plotted along with the histogram of the raw data.
-
-![](Analysis_files/figure-markdown_github-ascii_identifiers/ppcplot-1.png)
-
+![](Analysis_files/figure-markdown_github-ascii_identifiers/marginal%20dens-1.png)
 
 Inference on the interpolating function
 =======================================
@@ -163,7 +205,7 @@ riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)"
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/risk-1.png)
 
-The notable increment of the risk function at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD**<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
+The notable increment of the risk function at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
 
 A graphical representation of the BMD\_q for the different values of *q* can be obtained with
 
@@ -180,12 +222,12 @@ Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_
 
 ``` r
 q.values <- c(1,5,10)/100
-BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=.05)
+BMDq <- BMD(q.values, risk.data$mcmc.risk, x=seq(0,180, length=100), alpha=.05)
 knitr::kable(BMDq[c(1,2,5)], digits = 2)
 ```
 
 |     q|    BMD|  BMDL|
 |-----:|------:|-----:|
-|  0.01|   1.14|  0.61|
-|  0.05|   5.63|  3.50|
-|  0.10|  13.62|  9.16|
+|  0.01|   0.94|  0.59|
+|  0.05|   5.18|  3.41|
+|  0.10|  12.92|  8.88|
