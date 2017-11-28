@@ -173,7 +173,7 @@ Inference on the interpolating function
 
 Based on the above Figure, both adverse and non-adverse profiles are found across all the predictor space. What crucially changes with DDE is the degree *β*(*x*) of susceptibility of the women to the adverse effects of this chemical.
 
-The pointwise posterior mean and the 95% credible bands of the *β*(*x*) can be obtained with
+The pointwise posterior mean and the 95% credible bands of *β*(*x*) can be obtained with
 
 ``` r
 beta.data <- data.frame(beta=fit.comire$post.means$beta,
