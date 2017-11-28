@@ -35,7 +35,7 @@ ggplot(data=cpp) + geom_point(aes(x=dde, y=gest), alpha=.5, cex=.5) +
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/plot-1.png)
 
-To have a first quantification we fit a simple logistic model to the dichotimized outcome, i.e. we classify a birth as premature if it occurs before 37 weeks.
+To have a first quantification we fit a simple logistic model to the dichotomized outcome, i.e. we classify a birth as premature if it occurs before 37 weeks.
 
 ``` r
 premature <- y < 37
