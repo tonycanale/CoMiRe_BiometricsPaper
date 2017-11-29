@@ -8,7 +8,7 @@ Install the R package `CoMiRe_VERSION.tar.gz` with `R CMD INSTALL CoMiRe_VERSION
 
 ```R
 install.packages("devtools")
-devtools::install_github("tonycanale/CoMiRe")
+devtools::install_github("tonycanale/CoMiRe/CoMiRe")
 ```
 
 and then follow the tutorial [Tutorial.md](Tutorial.md) to reproduce the analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery.
