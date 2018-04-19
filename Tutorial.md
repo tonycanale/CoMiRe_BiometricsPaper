@@ -119,7 +119,7 @@ ppc <-    ggplot(ppc.data, aes(x=x, y=Fx)) +
   geom_line(data=data.frame(x=seq(0,180, length=100), y=below37.true), aes(x=x, y=y), col=1)+
   ylab(expression(F[x](37)*" | data")) + theme_bw() + 
   geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, cex=.5, pch="|") 
-ppc
+ppc + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
 ```
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/pp_cfr-1.png)
@@ -183,7 +183,7 @@ betaplot <- ggplot(beta.data, aes(dde,beta)) + geom_line(lty=1, col=4) +
   geom_ribbon(aes(ymax=upp, ymin=low), fill=4,alpha=.1) +
   labs(y=expression(beta(x)), x="Dichlorodiphenyldichloroethylene (DDE)")+ theme_bw() + 
   theme(plot.margin=unit(c(1,0,0,0),"lines")) + 
-  coord_cartesian(ylim=c(0,1), xlim=c(0,180))
+  coord_cartesian(ylim=c(0,1), xlim=c(0,150))
 betaplot + geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, cex=.5, pch="|") 
 ```
 
@@ -200,7 +200,8 @@ To obtain the additional risk function for a given threshold use the `add.risk()
 
 ``` r
 risk.data <- add.risk(a=37, fit=fit.comire, mcmc=mcmc, xgrid=seq(0,max(x), length=100), y=y)
-riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)", x=x)
+risk <- riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)", x=x)
+risk + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
 ```
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/risk-1.png)
