@@ -20,9 +20,9 @@ function(y, x, grid=NULL, mcmc, prior, state=NULL, seed, max.x=max(x))
     pi0[1,] = rep(1/H, H)
     pi1[1] = 1
     tau0[1,] = rgamma(H, prior$a, prior$b)
-    mu0[1,] = rnorm(H, prior$mu0, prior$kappa/tau0[1,])
+    mu0[1,] = rnorm(H, prior$mu0, sqrt(prior$kappa))
     tau1[1] = rgamma(1, prior$a, prior$b)
-    mu1[1] = rnorm(1, prior$mu0, prior$kappa/tau1[1])
+    mu1[1] = rtruncnorm(1, a=-Inf, b=min(mu0[1,]), prior$mu0, sqrt(prior$kappa))
     w[1,] = prior$dirpar/sum(prior$dirpar)
   }
   else
@@ -101,9 +101,8 @@ function(y, x, grid=NULL, mcmc, prior, state=NULL, seed, max.x=max(x))
     n_h = table(factor(c0, levels=1:H))
     hat_a = prior$a + n_h/2
     mean_h = tapply(y[ind0], factor(c0, levels=1:H), mean)
-    deviance_h = (n_h-1)*tapply(y[ind0], factor(c0, levels=1:H), var)
     mean_h[n_h==0]  = 0
-    deviance_h[n_h<=1] = 0
+    deviance_h = sapply(1:H, pssq, data=y[ind0], cluster = c0, locations = mu0[ite-1,])
     hat_b = prior$b + 0.5*(deviance_h)
     tau0[ite, ] = rgamma(H, hat_a, hat_b)
     hat_kappa = 1/(1/prior$kappa + n_h*tau0[ite,])
@@ -114,14 +113,13 @@ function(y, x, grid=NULL, mcmc, prior, state=NULL, seed, max.x=max(x))
     n_h = sum(d==1)
     hat_a = prior$a + n_h/2
     mean_h = mean(y[ind1])
-    deviance_h = (n_h-1)*var(y[ind1])
     mean_h[n_h==0]  = 0
-    deviance_h[n_h<=1] = 0
+    deviance_h = sum((y[ind1] -  mu1[ite-1])^2)
     hat_b = prior$b + 0.5*(deviance_h)
     tau1[ite] = rgamma(1, hat_a, hat_b)
     hat_kappa = 1/(1/prior$kappa + n_h*tau1[ite])
     hat_mu = hat_kappa*(1/prior$kappa*prior$mu0 + n_h*mean_h*tau1[ite])
-    mu1[ite] = rtruncnorm(1, a=-Inf, b=min(mu0[ite, ]), hat_mu, sqrt(hat_kappa))# c(30, 35, 40)#
+    mu1[ite] = rtruncnorm(1, a=-Inf, b=min(mu0[ite, ]), hat_mu, sqrt(hat_kappa))
     
     # update the values of the densities in the observed points
     f0i = sapply(1:n, mixdensity, y=y, pi=pi0[ite,], mu=mu0[ite,], tau=tau0[ite,])

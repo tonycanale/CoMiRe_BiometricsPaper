@@ -22,7 +22,7 @@ post.pred.check <- function(x, fit, mcmc, H=10, a=37, max.x, bandwidth=20)
   res
 }
 # posterior mean density
-fit.cdf.mcmc <- function(x, y.grid, fit, mcmc, H=10, max.x)
+fit.pdf.mcmc <- function(x, y.grid, fit, mcmc, H=10, max.x)
 {
   index <- c((mcmc$nb+1):(mcmc$nrep+mcmc$nb))[1:((mcmc$nrep)/mcmc$thin)*mcmc$thin]
   knots <- seq(0, max.x, length=J-3)
@@ -98,8 +98,7 @@ riskplot <- function(risk.data, xlabel="x", x=NULL)
   out <- ggplot(risk.data, aes(x,risk)) + geom_line(lty=1, col=4) + 
   geom_ribbon(aes(ymax=upp, ymin=low), fill=4,alpha=.1) +
   labs(y=expression(R[A](x, a)), x=xlabel)+ theme_bw() + 
-  theme(plot.margin=unit(c(1,0,0,0),"lines")) + 
-  coord_cartesian(ylim=c(0,.8), xlim=c(0,180)) 
+  theme(plot.margin=unit(c(1,0,0,0),"lines")) 
   if(is.null(x)) return(out)
   else{
     onlyx <- data.frame(x, zero=rep(0,length(x)))
