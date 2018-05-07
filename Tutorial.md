@@ -38,7 +38,7 @@ ggplot(data=cpp) + geom_point(aes(x=dde, y=gest), alpha=.5, cex=.5) +
 To have a first quantification we fit a simple logistic model to the dichotomized outcome, i.e. we classify a birth as premature if it occurs before 37 weeks.
 
 ``` r
-premature <- y < 37
+premature <- y <= 37
 glmfit<- glm(premature ~ x, family="binomial")
 summary(glmfit)
 ```
