@@ -15,4 +15,4 @@ and then follow the tutorial [Tutorial.md](Tutorial.md) to reproduce the analysi
 
 The folder `./CoMiRe` contains the package source files.
 
-The output of [Tutorial.md](Tutorial.md) are obtained using R version 3.4.0
+The outputs of [Tutorial.md](Tutorial.md) are obtained using R version 3.4.0
