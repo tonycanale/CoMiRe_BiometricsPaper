@@ -1,7 +1,7 @@
 Analysis of the CPP data
 ================
 
-Analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery [(Longnecker et al., 2001)](http://www.thelancet.com/journals/lancet/article/PIIS0140673601053296/abstract) as discussed in [Canale, Durante and Dunson, (2017)](https://arxiv.org/abs/1701.02950)
+Analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery [Longnecker et al., (2001)](http://www.thelancet.com/journals/lancet/article/PIIS0140673601053296/abstract) as discussed in [Canale, Durante and Dunson, (2017)](https://arxiv.org/abs/1701.02950)
 
 Load data and packages
 ======================
@@ -35,7 +35,7 @@ ggplot(data=cpp) + geom_point(aes(x=dde, y=gest), alpha=.5, cex=.5) +
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/plot-1.png)
 
-To have a first quantification we fit a simple logistic model to the dichotomized outcome, i.e. we classify a birth as premature if it occurs before 37 weeks.
+To have a first quantification we fit a simple logistic model to the dichotimized outcome, i.e. we classify a birth as premature if it occurs before 37 weeks.
 
 ``` r
 premature <- y <= 37
@@ -49,32 +49,32 @@ summary(glmfit)
     ## 
     ## Deviance Residuals: 
     ##     Min       1Q   Median       3Q      Max  
-    ## -1.2725  -0.5843  -0.5408  -0.5096   2.1111  
+    ## -1.3010  -0.6013  -0.5568  -0.5243   2.0833  
     ## 
     ## Coefficients:
     ##              Estimate Std. Error z value Pr(>|z|)    
-    ## (Intercept) -2.160870   0.102249 -21.133  < 2e-16 ***
-    ## x            0.014676   0.002468   5.946 2.75e-09 ***
+    ## (Intercept) -2.095472   0.100301 -20.892  < 2e-16 ***
+    ## x            0.014674   0.002436   6.023 1.72e-09 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## (Dispersion parameter for binomial family taken to be 1)
     ## 
-    ##     Null deviance: 2003.2  on 2311  degrees of freedom
-    ## Residual deviance: 1970.0  on 2310  degrees of freedom
-    ## AIC: 1974
+    ##     Null deviance: 2069.4  on 2311  degrees of freedom
+    ## Residual deviance: 2035.2  on 2310  degrees of freedom
+    ## AIC: 2039.2
     ## 
     ## Number of Fisher Scoring iterations: 4
 
 CoMiRe estimation
 =================
 
-To fit the **CoMiRe** model it is first necessary to fix the following prior parameters:
+To fit the comire model it is first necessary to fix the following prior paramters:
 
 ``` r
 J <- 10 
 H <- 10
-prior <- list(mu0=mean(y), dirpar=rep(1, J)/J, kappa=1, a=2, b=2, H=H, J=J, alpha=1/H)
+prior <- list(mu0=mean(y), dirpar=rep(1, J)/J, kappa=10, a=2, b=2, H=H, J=J, alpha=1/H)
 ```
 
 and the following MCMC settings
@@ -86,7 +86,7 @@ mcmc <- list(nrep=5000, nb=2000, thin=5, ndisplay=4)
 The Gibbs sampling algorithm is executed via
 
 ``` r
-fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
+fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=5, max.x=180)
 ```
 
     ## Burn in done
@@ -98,15 +98,15 @@ fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=1, max.x=180)
 Posterior predictive check
 ==========================
 
-Before assessing the performance of CoMiRe in inference on the additional risk functions and benchmark doses, we first check the model adequacy in terms of goodness of fit. This is done via posterior predictive checks as discussed in Section 3.1 of the paper. 
+Before assessing the performance in estimating the additional risks and benchmark doses, we check the model adequacy in terms of goodness of fit by means of posterior predictive checks.
 
-Specifically, we use the R function `post.pred.check()` to draw samples from the posterior predictive distribution of a smoothed empirical estimate of *F*<sub>*x*</sub>(37).
+Specifically, we use the R function `post.pred.check()` which draws from the posterior predictive the smoothed empirical estimates of *F*<sub>*x*</sub>(37).
 
 ``` r
 below37.comire <- post.pred.check(x, fit.comire, mcmc, H=10, a=37, max.x=180)
 ```
 
-We draw 50 of these samples and plot them along with the smoothed empirical estimate of *F*<sub>*x*</sub>(37) calculated from the observed sample data in the CPP application.
+Then we select 50 samples from this posterior predictive smoothed estimates of *F*<sub>*x*</sub>(37) and plot them along with the related quantity obtained calculated on the original observed sample.
 
 ``` r
 below37.true <- locpoly(x=x, y=y<37, degree=0, bandwidth = 20, 
@@ -124,10 +124,10 @@ ppc + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/pp_cfr-1.png)
 
-Inference on the conditional density
+Marginal densities estimation
 =============================
 
-We now study the posterior distribution of the conditional density of the response computed for different values *x* of the dose. Specifically, we first subdivide the observed dose exposures in bins with
+We now compute the pointwise posterior mean densities for different *x* value. Specifically, we first subdivide the observed data in bins with
 
 ``` r
 break.points <- c(0, 15,30,45,60, 75, 180)
@@ -142,14 +142,14 @@ xlab <- c("Gestational age at delivery (DDE<15)",
           )
 ```
 
-Then the pointwise mean and credible bands for the conditional density of the response can be obtained for every *x* in `x.cpoints` as follows
+Then the pointwise posterior mean densities for *x* in `x.cpoints` can be obtained with
 
 ``` r
 y.grid <- seq(min(y)-sqrt(var(y)), max(y) + sqrt(var(y)), length = 100) 
 all.pdf <- list()
 for(j in 1:6)
   {
-  pdf_fit <- fit.cdf.mcmc(x.cpoints[j], y.grid=y.grid, fit.comire, mcmc=mcmc, H=10, max.x=180)
+  pdf_fit <- fit.pdf.mcmc(x.cpoints[j], y.grid=y.grid, fit.comire, mcmc=mcmc, H=10, max.x=180)
   data <- data.frame(pdf_fit, y.grid)
   names(data)[1:3] <- c("mean","low","upp")
  
@@ -171,9 +171,9 @@ grid.arrange(all.pdf[[1]],all.pdf[[2]],all.pdf[[3]],all.pdf[[4]],all.pdf[[5]],al
 Inference on the interpolating function
 =======================================
 
-Based on the above Figure, both adverse and non-adverse profiles are found across all the predictor space. What crucially changes with DDE is the degree *β*(*x*) of susceptibility of the women to the adverse effects of this chemical.
+Both adverse and non-adverse profiles are found across all the predictor space. What crucially changes with DDE is the degree *β*(*x*) of susceptibility of the women to the adverse effects of this chemical.
 
-The pointwise posterior mean and the 95% credible bands of *β*(*x*) can be obtained with
+The posterior mean and the 95% credible bands of the *β*(*x*) can be obtained with
 
 ``` r
 beta.data <- data.frame(beta=fit.comire$post.means$beta,
@@ -189,26 +189,25 @@ betaplot + geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, 
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/beta-1.png)
 
-The plot highlights a notable increment in the probability of the most adverse health profile at low-dose exposures.
+The plot highlights a notable increment in the probability of the most adverse health profile at low--dose exposures.
 
 Additional risk and BMD
 =======================
 
-To perform benchmark dose analysis by means of the additional risk function, we consider the standard preterm threshold *a* = 37.
+To perform a benchmark dose analyses by means of the additional risk function, we consider the standard preterm threshold *a* = 37.
 
-To obtain the additional risk function for a given threshold use the `add.risk()` function and plot it as a function of `x` with `riskplot()`.
+To obtain the additional risk function for a given threshold use the `add.risk()` function and plot it in function of `x` with `riskplot()`.
 
 ``` r
 risk.data <- add.risk(a=37, fit=fit.comire, mcmc=mcmc, xgrid=seq(0,max(x), length=100), y=y)
-risk <- riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)", x=x)
-risk + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
+riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)", x=x) + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
 ```
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/risk-1.png)
 
-The notable increment of the risk function at low-dose exposures suggests conservative benchmark doses. This is confirmed by looking at the BMD<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
+The notable increment of the risk function at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD**<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
 
-A graphical representation of the BMD<sub>*q*</sub> for the different values of *q* can be obtained with
+A graphical representation of the BMD\_q for the different values of *q* can be obtained with
 
 ``` r
 bmd.data <- BMD(seq(0,.20, length=50), risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=0.05)
@@ -217,9 +216,9 @@ bmd.plot(bmd.data)
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/bmd-1.png)
 
-where the solid line represent the pointwise posterior mean of the BMD<sub>*q*</sub> and the shaded areas are the related 95% credible bands.
+where the solid line represent the posterior mean BMD\_q and the shaded areas the related 95% credible bands.
 
-Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via the posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimateted with the lower 5% quantile of the posterior distribution of the corresponding benchmark dose.
+Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_q, estimated via posterior mean, and the benchmark dose limit (BMDL\_q), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
@@ -229,6 +228,6 @@ knitr::kable(BMDq[c(1,2,5)], digits = 2)
 
 |     q|    BMD|  BMDL|
 |-----:|------:|-----:|
-|  0.01|   0.94|  0.59|
-|  0.05|   5.18|  3.41|
-|  0.10|  12.92|  8.88|
+|  0.01|   1.03|  0.64|
+|  0.05|   5.79|  3.70|
+|  0.10|  15.29|  9.85|
