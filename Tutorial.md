@@ -189,7 +189,7 @@ betaplot + geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, 
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/beta-1.png)
 
-The plot highlights a notable increment in the probability of the most adverse health profile at low--dose exposures.
+The plot highlights a notable increment in the probability of the most adverse health profile at low-dose exposures.
 
 Additional risk and BMD
 =======================
