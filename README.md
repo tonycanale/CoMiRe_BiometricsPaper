@@ -13,6 +13,4 @@ devtools::install_github("tonycanale/CoMiRe/CoMiRe")
 
 and then follow the tutorial [Tutorial.md](Tutorial.md) to reproduce the analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery.
 
-The folder `./CoMiRe` contains the package source files.
-
-The outputs of [Tutorial.md](Tutorial.md) are obtained using R version 3.4.0
+The folder `./CoMiRe` contains the package source files. The outputs of [Tutorial.md](Tutorial.md) are obtained using R version 3.4.0
