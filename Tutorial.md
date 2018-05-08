@@ -119,7 +119,8 @@ ppc <-    ggplot(ppc.data, aes(x=x, y=Fx)) +
   geom_line(data=data.frame(x=seq(0,180, length=100), y=below37.true), aes(x=x, y=y), col=1)+
   ylab(expression(F[x](37)*" | data")) + theme_bw() + 
   geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, cex=.5, pch="|") 
-ppc + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
+ppc + coord_cartesian(ylim=c(0,1), xlim=c(0,150)) + xlim(c(0,150))
+
 ```
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/pp_cfr-1.png)
@@ -158,7 +159,7 @@ for(j in 1:6)
     geom_ribbon(aes(ymax=upp, ymin=low, x=y.grid), fill=4,alpha=.1) + 
     coord_cartesian(xlim=c(25,48)) +  labs(x=xlab[j], y="") + 
     theme_bw() + coord_cartesian(ylim=c(0, 0.25)) +
-    theme(plot.margin=unit(c(1,0,0,0),"lines"), axis.title=element_text(size=10))
+    theme(plot.margin=unit(c(1,0,0,0),"lines"), axis.title=element_text(size=6))
   
   all.pdf[[j]] <- pdf.j
 }
@@ -182,9 +183,9 @@ beta.data <- data.frame(beta=fit.comire$post.means$beta,
 betaplot <- ggplot(beta.data, aes(dde,beta)) + geom_line(lty=1, col=4) + 
   geom_ribbon(aes(ymax=upp, ymin=low), fill=4,alpha=.1) +
   labs(y=expression(beta(x)), x="Dichlorodiphenyldichloroethylene (DDE)")+ theme_bw() + 
-  theme(plot.margin=unit(c(1,0,0,0),"lines")) + 
-  coord_cartesian(ylim=c(0,1), xlim=c(0,150))
-betaplot + geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, cex=.5, pch="|") 
+  theme(plot.margin=unit(c(1,0,0,0),"lines")) + ylim(c(0,1)) +  xlim(c(0,150)) +
+geom_point(data=data.frame(x, zero=rep(0,n)), aes(x, zero), alpha=1, cex=.5, pch="|") 
+betaplot
 ```
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/beta-1.png)
@@ -200,7 +201,7 @@ To obtain the additional risk function for a given threshold use the `add.risk()
 
 ``` r
 risk.data <- add.risk(a=37, fit=fit.comire, mcmc=mcmc, xgrid=seq(0,max(x), length=100), y=y)
-riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)", x=x) + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
+riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)", x=x) + ylim(c(0,1)) + xlim(c(0,150))
 ```
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/risk-1.png)
@@ -211,7 +212,7 @@ A graphical representation of the BMD<sub>*q*</sub> for the different values of 
 
 ``` r
 bmd.data <- BMD(seq(0,.20, length=50), risk.data$mcmc.risk, x=seq(0,max(x), length=100), alpha=0.05)
-bmd.plot(bmd.data)
+bmd.plot(bmd.data) + coord_cartesian(y=c(c(0,85))) 
 ```
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/bmd-1.png)
