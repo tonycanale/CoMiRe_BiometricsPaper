@@ -69,7 +69,7 @@ summary(glmfit)
 CoMiRe estimation
 =================
 
-To fit the CoMiRe model it is first necessary to fix the following prior paramters:
+To fit the CoMiRe model it is first necessary to fix the following prior parameters:
 
 ``` r
 J <- 10 
