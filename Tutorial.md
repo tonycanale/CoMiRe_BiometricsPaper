@@ -205,7 +205,7 @@ riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)"
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/risk-1.png)
 
-The notable increment of the additional risk at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates of the benchmark dose related to a given risk function for different values of risk *q*.
+The notable increment of the additional risk at low-dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates of the benchmark dose related to a given risk function for different values of risk *q*.
 
 A graphical representation of the BMD<sub>*q*</sub> for the different values of *q* can be obtained with
 
