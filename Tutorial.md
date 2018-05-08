@@ -1,7 +1,7 @@
 Analysis of the CPP data
 ================
 
-Analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery [Longnecker et al., (2001)](http://www.thelancet.com/journals/lancet/article/PIIS0140673601053296/abstract) as discussed in [Canale, Durante and Dunson, (2017)](https://arxiv.org/abs/1701.02950)
+Analysis of the US Collaborative Perinatal Project (CPP) data on the effect of Dichlorodiphenyldichloroethylene (DDE) on premature delivery [Longnecker et al., (2001)](http://www.thelancet.com/journals/lancet/article/PIIS0140673601053296/abstract) as discussed in [Canale, Durante and Dunson, (2018)](https://arxiv.org/abs/1701.02950)
 
 Load data and packages
 ======================
@@ -35,7 +35,7 @@ ggplot(data=cpp) + geom_point(aes(x=dde, y=gest), alpha=.5, cex=.5) +
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/plot-1.png)
 
-To have a first quantification we fit a simple logistic model to the dichotimized outcome, i.e. we classify a birth as premature if it occurs before 37 weeks.
+To have a first quantification we fit a simple logistic model to the dichotimized outcome, i.e. we classify a birth as premature if the gestational weeks are below or equal to 37.
 
 ``` r
 premature <- y <= 37
@@ -69,7 +69,7 @@ summary(glmfit)
 CoMiRe estimation
 =================
 
-To fit the comire model it is first necessary to fix the following prior paramters:
+To fit the CoMiRe model it is first necessary to fix the following prior paramters:
 
 ``` r
 J <- 10 
@@ -98,15 +98,15 @@ fit.comire <- comire.gibbs(y, x, mcmc=mcmc, prior=prior, seed=5, max.x=180)
 Posterior predictive check
 ==========================
 
-Before assessing the performance in estimating the additional risks and benchmark doses, we check the model adequacy in terms of goodness of fit by means of posterior predictive checks.
+Before assessing the performance in estimating the additional risks and benchmark doses, we first check the model adequacy in terms of goodness of fit. This is done via posterior predictive checks.
 
-Specifically, we use the R function `post.pred.check()` which draws from the posterior predictive the smoothed empirical estimates of *F*<sub>*x*</sub>(37).
+Specifically, we use the R function `post.pred.check()` which draws smoothed empirical estimates of *F*<sub>*x*</sub>(37) from their corresponding posterior predictive distribution.
 
 ``` r
 below37.comire <- post.pred.check(x, fit.comire, mcmc, H=10, a=37, max.x=180)
 ```
 
-Then we select 50 samples from this posterior predictive smoothed estimates of *F*<sub>*x*</sub>(37) and plot them along with the related quantity obtained calculated on the original observed sample.
+We draw 50 samples and plot them along with the smoothed estimate of *F*<sub>*x*</sub>(37) computed from the observed data.
 
 ``` r
 below37.true <- locpoly(x=x, y=y<37, degree=0, bandwidth = 20, 
@@ -127,7 +127,7 @@ ppc + coord_cartesian(ylim=c(0,1), xlim=c(0,150))
 Marginal densities estimation
 =============================
 
-We now compute the pointwise posterior mean densities for different *x* value. Specifically, we first subdivide the observed data in bins with
+We now compute the pointwise posterior mean and credible intervals of the response densities for different values of *x*. Specifically, we first divide the observed data into bins.
 
 ``` r
 break.points <- c(0, 15,30,45,60, 75, 180)
@@ -142,7 +142,7 @@ xlab <- c("Gestational age at delivery (DDE<15)",
           )
 ```
 
-Then the pointwise posterior mean densities for *x* in `x.cpoints` can be obtained with
+Then the pointwise posterior mean and credible intervals of the response densities for *x* in `x.cpoints` can be obtained with
 
 ``` r
 y.grid <- seq(min(y)-sqrt(var(y)), max(y) + sqrt(var(y)), length = 100) 
@@ -194,9 +194,9 @@ The plot highlights a notable increment in the probability of the most adverse h
 Additional risk and BMD
 =======================
 
-To perform a benchmark dose analyses by means of the additional risk function, we consider the standard preterm threshold *a* = 37.
+To perform quantitative risk assessment via the additional risk function, we consider the standard preterm threshold *a* = 37.
 
-To obtain the additional risk function for a given threshold use the `add.risk()` function and plot it in function of `x` with `riskplot()`.
+To obtain the additional risk function for a given threshold use the `add.risk()` function and plot it via `riskplot()`.
 
 ``` r
 risk.data <- add.risk(a=37, fit=fit.comire, mcmc=mcmc, xgrid=seq(0,max(x), length=100), y=y)
@@ -205,7 +205,7 @@ riskplot(risk.data$summary.risk, xlabel="Dichlorodiphenyldichloroethylene (DDE)"
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/risk-1.png)
 
-The notable increment of the risk function at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD**<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
+The notable increment of the additional risk at low--dose exposures suggests conservative benchmark doses. This can be confirmed by looking at the BMD**<sub>*q*</sub> expressed as a function of *q*. The latter can be obtained with the function `BMD()` which extracts estimates for the benchmark dose related to a given risk function for differente values of risk *q*.
 
 A graphical representation of the BMD\_q for the different values of *q* can be obtained with
 
@@ -216,7 +216,7 @@ bmd.plot(bmd.data)
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/bmd-1.png)
 
-where the solid line represent the posterior mean BMD\_q and the shaded areas the related 95% credible bands.
+where the solid line represent the posterior mean of the BMD\_q and the shaded areas the related 95% credible bands.
 
 Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD\_q, estimated via posterior mean, and the benchmark dose limit (BMDL\_q), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
 
