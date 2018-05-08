@@ -216,9 +216,9 @@ bmd.plot(bmd.data)
 
 ![](Analysis_files/figure-markdown_github-ascii_identifiers/bmd-1.png)
 
-where the solid line represent the posterior mean of the BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands.
+where the solid line represents the posterior mean of the BMD<sub>*q*</sub> and the shaded areas the related 95% credible bands.
 
-Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimateted with lower 5% quantile of the posterior distribution of the benchmark dose.
+Typical values of *q* are 1%, 5%, and 10%. The next table reports both the BMD<sub>*q*</sub>, estimated via the posterior mean, and the benchmark dose limit (BMDL<sub>*q*</sub>), estimated with the lower 5% quantile of the posterior distribution of the benchmark dose.
 
 ``` r
 q.values <- c(1,5,10)/100
